@@ -1,0 +1,18 @@
+{
+  "target_rps": 100,
+  "seconds": 60,
+  "client_procs": 1,
+  "sent": 6000,
+  "ok": 6000,
+  "errors": {},
+  "achieved_rps": 100.0,
+  "late_sends": 0,
+  "latency_ms": {
+    "p50": 3.2,
+    "p95": 4.8,
+    "p99": 9.4,
+    "max": 42.8
+  },
+  "within_200ms_pct": 100.0,
+  "within_500ms_pct": 100.0
+}

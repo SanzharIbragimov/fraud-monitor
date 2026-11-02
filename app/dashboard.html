@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fraud Monitor — антифрод-контур (прототип)</title>
+<style>
+  :root { --ink:#18212b; --muted:#5d6977; --line:#e2e6eb; --bg:#f5f6f8; --card:#fff;
+          --ok:#1f8a5b; --warn:#c77d0a; --bad:#c23b3b; --acc:#2456c9; --nav:#10243e; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.45 "Segoe UI", system-ui, -apple-system, sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--nav); color:#fff; padding:14px 28px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  header h1 { font-size:18px; margin:0; font-weight:600; }
+  header .tag { background:#f4b942; color:var(--nav); padding:3px 10px; border-radius:4px; font-size:12px; font-weight:700; }
+  header .key { margin-left:auto; font-size:12px; color:#c9d3df; display:flex; gap:6px; align-items:center; }
+  header .key input { width:170px; font:12px Consolas, monospace; padding:4px 6px; border-radius:4px; border:0; }
+  nav { background:#fff; border-bottom:1px solid var(--line); padding:0 28px; display:flex; gap:4px; flex-wrap:wrap; }
+  nav button { font:inherit; background:none; border:0; border-bottom:3px solid transparent; padding:11px 12px; cursor:pointer; color:var(--muted); }
+  nav button.on { color:var(--ink); border-bottom-color:var(--acc); font-weight:600; }
+  main { max-width:1240px; margin:0 auto; padding:20px 28px 48px; }
+  section { display:none; } section.on { display:block; }
+  h2 { font-size:16px; margin:22px 0 10px; } h2:first-child { margin-top:4px; }
+  .note { color:var(--muted); font-size:12.5px; margin:0 0 10px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:14px 16px; }
+  .kpis { display:grid; grid-template-columns:repeat(6, 1fr); gap:10px; }
+  .kpi { background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .kpi b { display:block; font-size:21px; font-variant-numeric:tabular-nums; }
+  .kpi span { color:var(--muted); font-size:12px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; font-size:13px; }
+  th { font-weight:600; color:var(--muted); font-size:12px; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  tr.click { cursor:pointer; } tr.click:hover { background:#f0f4ff; } tr.sel { background:#e7eeff; }
+  .pill { display:inline-block; padding:1px 8px; border-radius:10px; font-size:11.5px; font-weight:600; color:#fff; }
+  .allow{background:var(--ok)} .challenge{background:var(--warn)} .decline{background:var(--bad)}
+  .open{background:#6b7a8c} .fraud{background:var(--bad)} .legit{background:var(--ok)}
+  .chip { display:inline-block; padding:1px 7px; border-radius:4px; background:#eef1f5; font-size:11.5px; margin:1px 2px 1px 0; }
+  button.b { font:inherit; border:1px solid var(--line); background:#fff; padding:6px 11px; border-radius:6px; cursor:pointer; }
+  button.b:hover { border-color:var(--acc); color:var(--acc); }
+  button.p { background:var(--acc); color:#fff; border-color:var(--acc); } button.p:hover{ color:#fff; opacity:.9 }
+  button.r { background:var(--bad); color:#fff; border-color:var(--bad); }
+  button.g { background:var(--ok); color:#fff; border-color:var(--ok); }
+  button.r:hover, button.g:hover { color:#fff; opacity:.9; }
+  #caseList td:nth-child(2), #recent td:first-child { white-space:nowrap; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid-cases { display:grid; grid-template-columns:1.1fr 1fr; gap:14px; align-items:start; }
+  .scen { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+  .scen button { text-align:left; padding:9px 11px; min-height:58px; }
+  .scen button small { display:block; color:var(--muted); font-size:11.5px; }
+  textarea { width:100%; font:12.5px/1.4 Consolas, monospace; border:1px solid var(--line); border-radius:6px; padding:8px; }
+  code, .mono { font-family:Consolas, monospace; font-size:12px; }
+  .reasons li { margin:3px 0; } .pts { font-family:Consolas, monospace; font-size:12px; color:var(--muted); }
+  .msg { margin-top:8px; font-size:13px; } .msg.err { color:var(--bad); } .msg.ok { color:var(--ok); }
+  .feat { columns:2; font-size:12px; } .feat div { break-inside:avoid; }
+  .bar { height:8px; border-radius:3px; background:var(--acc); display:inline-block; vertical-align:middle; }
+  footer { color:var(--muted); font-size:12px; margin-top:28px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Fraud Monitor · антифрод-контур платёжного приложения</h1>
+  <span class="tag">ПРОТОТИП · ДАННЫЕ ВЫМЫШЛЕННЫЕ</span>
+  <label class="key">API-ключ аналитика <input id="key" value="{{DEMO_KEY}}"></label>
+</header>
+<nav id="nav">
+  <button data-t="mon" class="on">Мониторинг</button>
+  <button data-t="scen">Сценарии ТЗ</button>
+  <button data-t="cases">Разбор инцидентов</button>
+  <button data-t="rules">Правила</button>
+  <button data-t="lists">Стоп-листы</button>
+  <button data-t="hooks">Вебхуки</button>
+  <button data-t="audit">Журнал</button>
+</nav>
+<main>
+<section id="mon" class="on">
+  <div class="kpis" id="kpis"></div>
+  <h2>Последние решения</h2>
+  <p class="note">Поток вымышленных событий (прогрев при запуске) и сценарии из вкладки «Сценарии ТЗ». Время — время ответа движка без сети.</p>
+  <div class="card"><table id="recent"></table></div>
+  <div class="grid2" style="margin-top:14px">
+    <div><h2>Срабатывания правил</h2><div class="card"><table id="hits"></table></div></div>
+    <div><h2>Модель</h2><div class="card" id="model"></div></div>
+  </div>
+</section>
+
+<section id="scen">
+  <h2>Шесть сценариев раздела 4 ТЗ</h2>
+  <p class="note">Каждая кнопка прогоняет последовательность событий на новых вымышленных клиентах и показывает решение по последнему событию с причинами.</p>
+  <div class="scen" id="scenBtns"></div>
+  <div class="card" style="margin-top:14px" id="scenRes"><span class="note">Выберите сценарий.</span></div>
+</section>
+
+<section id="cases">
+  <h2>Очередь инцидентов</h2>
+  <p class="note">Отклонённые операции и операции по правилам с пометкой «инцидент». Решение аналитика пишется в журнал и становится меткой для дообучения модели.</p>
+  <div style="margin-bottom:8px">
+    <button class="b" onclick="loadCases('open')">Открытые</button>
+    <button class="b" onclick="loadCases('fraud')">Мошенничество</button>
+    <button class="b" onclick="loadCases('legit')">Легитимные</button>
+    <button class="b" onclick="loadCases('all')">Все</button>
+    <a class="b" style="text-decoration:none;color:inherit;padding:6px 11px;border:1px solid var(--line);border-radius:6px" href="#" onclick="dl('/v1/reports/cases.csv','cases.csv');return false">Выгрузить CSV</a>
+  </div>
+  <div class="grid-cases">
+    <div class="card"><table id="caseList"></table></div>
+    <div class="card" id="caseCard"><span class="note">Выберите инцидент.</span></div>
+  </div>
+</section>
+
+<section id="rules">
+  <h2>Правила (редактирует аналитик, без разработчиков)</h2>
+  <p class="note">Формат: условие = [признак, оператор, значение]; «$limits.…» — значение из настроек страны. Перед сохранением правила проверяются; изменение получает версию и пишется в журнал.</p>
+  <div class="grid2">
+    <div>
+      <textarea id="rulesText" rows="30" spellcheck="false"></textarea>
+      <div style="margin-top:8px"><button class="b" onclick="validateRules()">Проверить</button>
+        <button class="b p" onclick="saveRules()">Сохранить и применить</button></div>
+      <div class="msg" id="rulesMsg"></div>
+    </div>
+    <div><div class="card"><b>Признаки для условий</b><div class="feat" id="feats" style="margin-top:8px"></div></div></div>
+  </div>
+</section>
+
+<section id="lists">
+  <h2>Стоп-листы</h2>
+  <p class="note">Внутренние списки и списки, полученные заказчиком от национальных антифрод-систем. Загрузка: API, эта форма или папка <code>lists/inbox</code> (обновляется автоматически). Значения — хеши, не открытые данные.</p>
+  <div class="grid2">
+    <div class="card"><table id="listSum"></table></div>
+    <div class="card">
+      <b>Импорт CSV</b>
+      <p class="note">Колонки: list_name, jurisdiction, entity_type (phone | wallet | card | iban | device | user), value, reason</p>
+      <input type="file" id="csvFile" accept=".csv">
+      <textarea id="csvText" rows="6" placeholder="list_name,jurisdiction,entity_type,value,reason"></textarea>
+      <button class="b p" onclick="importCsv()">Загрузить</button>
+      <div class="msg" id="listMsg"></div>
+    </div>
+  </div>
+</section>
+
+<section id="hooks">
+  <h2>Вебхуки</h2>
+  <p class="note">Асинхронные события для бэкенда заказчика. Подпись <code>X-Signature</code> = HMAC-SHA256 тела. В демо подписан встроенный приёмник <code>/demo/webhook-sink</code>.</p>
+  <div class="grid2">
+    <div class="card"><b>Доставки</b><table id="deliv"></table></div>
+    <div class="card"><b>Получено приёмником (подпись проверена)</b><table id="sink"></table></div>
+  </div>
+</section>
+
+<section id="audit">
+  <h2>Журнал действий пользователей и изменений</h2>
+  <div class="card"><table id="auditT"></table></div>
+</section>
+<footer>Прототип к отклику на технологическую задачу Astana Hub (Monexsol). Все клиенты, операции и списки вымышленные. Swagger: <a href="/docs">/docs</a></footer>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = n => n == null ? '—' : Number(n).toLocaleString('ru-RU');
+const SC = {social_engineering:'соц. инженерия', account_takeover:'захват аккаунта', compromised_cards:'чужие карты',
+  droppers:'дропперы', multiaccount:'мультиаккаунты', stoplist:'стоп-лист', data_quality:'качество данных'};
+const ACT = {allow:'пропустить', challenge:'подтверждение', decline:'отклонить'};
+const ST = {open:'открыт', fraud:'мошенничество', legit:'легитимно'};
+function key(){ return $('#key').value.trim(); }
+async function api(path, opt={}){
+  opt.headers = Object.assign({'X-API-Key': key()}, opt.headers || {});
+  const r = await fetch(path, opt);
+  const ct = r.headers.get('content-type') || '';
+  const body = ct.includes('json') ? await r.json() : await r.text();
+  if(!r.ok) throw new Error(body.detail || body);
+  return body;
+}
+function pill(a, map=ACT){ return `<span class="pill ${a}">${map[a]||a}</span>`; }
+function chips(list){ return (list||[]).map(s => `<span class="chip">${SC[s]||s}</span>`).join(''); }
+async function dl(path, name){
+  const r = await fetch(path, {headers:{'X-API-Key': key()}}); const b = await r.blob();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.click();
+}
+document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === b.dataset.t));
+  ({mon:loadMon, cases:()=>loadCases('open'), rules:loadRules, lists:loadLists, hooks:loadHooks, audit:loadAudit}[b.dataset.t]||(()=>0))();
+});
+
+async function loadMon(){
+  try {
+    const m = await api('/v1/metrics');
+    const k = [['Событий', fmt(m.events)], ['Пропущено', fmt(m.allow)], ['Подтверждение', fmt(m.challenge)],
+      ['Отклонено', fmt(m.decline)], ['Открытых инцидентов', fmt(m.cases_open)],
+      ['p95 / p99 движка, мс', `${m.engine_latency_ms.p95 ?? '—'} / ${m.engine_latency_ms.p99 ?? '—'}`]];
+    $('#kpis').innerHTML = k.map(([a,b]) => `<div class="kpi"><b>${b}</b><span>${a}</span></div>`).join('');
+    const rec = await api('/v1/decisions/recent?limit=18');
+    $('#recent').innerHTML = '<tr><th>Время</th><th>Событие</th><th>Страна</th><th>Клиент</th><th class="num">Сумма</th><th>Решение</th><th class="num">Балл</th><th>Сценарии</th><th>Главные причины</th><th class="num">мс</th></tr>' +
+      rec.map(r => `<tr><td class="mono">${esc(r.ts.replace('T',' '))}</td><td>${esc(r.type)}</td><td>${esc(r.jurisdiction)}</td><td class="mono">${esc(r.user)}</td>
+      <td class="num">${r.amount ? fmt(r.amount)+' '+esc(r.currency) : ''}</td><td>${pill(r.action)}</td><td class="num">${r.score}</td>
+      <td>${chips(r.scenarios)}</td><td class="mono">${esc(r.top.join(', '))}</td><td class="num">${r.latency_ms}</td></tr>`).join('');
+    const hits = Object.entries(m.rule_hits).slice(0, 12); const max = Math.max(1, ...hits.map(h => h[1]));
+    $('#hits').innerHTML = hits.map(([r,n]) => `<tr><td class="mono">${esc(r)}</td><td style="width:45%"><span class="bar" style="width:${Math.max(3,100*n/max)}%"></span></td><td class="num">${fmt(n)}</td></tr>`).join('');
+    const md = await api('/v1/model');
+    const w = Object.entries(md.weights).slice(0, 8);
+    $('#model').innerHTML = `<div><b>${esc(md.version)}</b></div><p class="note">${esc(md.meta.note || md.meta.trained_on || '')}</p>
+      <p class="note">Правила: ${esc(m.rules_version)} · меток аналитиков: ${m.labels} · статус: ${esc(md.status.state)} ${esc(md.status.message)}</p>
+      <table>${w.map(([n,c]) => `<tr><td class="mono">${esc(n)}</td><td class="num">${c > 0 ? '+' : ''}${c}</td></tr>`).join('')}</table>`;
+  } catch(e){ $('#kpis').innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+}
+
+async function initScen(){
+  const s = await (await fetch('/demo/scenarios')).json();
+  $('#scenBtns').innerHTML = Object.entries(s).map(([k,t]) => `<button class="b" onclick="runScen('${k}')"><b>${k === 'legit' ? 'Легитимная операция' : (SC[k]||k)}</b><small>${esc(t)}</small></button>`).join('');
+}
+async function runScen(name){
+  $('#scenRes').innerHTML = '<span class="note">Выполняю…</span>';
+  const r = await (await fetch('/demo/scenario/' + name, {method:'POST'})).json();
+  const d = r.final;
+  const steps = r.steps.map((s,i) => `<tr><td>${i+1}</td><td>${esc(s.event.event_type)}${s.event.changed_field ? ' ('+esc(s.event.changed_field)+')' : ''}</td>
+     <td class="mono">${esc(s.event.user_id)}</td><td class="num">${s.event.payment ? fmt(s.event.payment.amount) + ' ' + s.event.payment.currency : ''}</td>
+     <td>${pill(s.decision.action)}</td><td class="num">${s.decision.score}</td><td class="num">${s.decision.latency_ms}</td></tr>`).join('');
+  $('#scenRes').innerHTML = `<div><b>${esc(r.title)}</b></div>
+    <p style="margin:8px 0">Итог: ${pill(d.action)} · балл <b>${d.score}</b> · сценарии: ${chips(d.scenarios) || '—'} ${d.case_id ? '· инцидент #' + d.case_id : ''}</p>
+    <div class="grid2"><div><b>Причины (объяснимость)</b><ul class="reasons">${d.reasons.map(x => `<li><span class="pts">${x.points > 0 ? '+' : ''}${x.points}</span> <code>${esc(x.code)}</code> ${esc(x.text)}</li>`).join('') || '<li>нет</li>'}</ul></div>
+    <div><b>Шаги сценария</b><table><tr><th>#</th><th>Событие</th><th>Клиент</th><th class="num">Сумма</th><th>Решение</th><th class="num">Балл</th><th class="num">мс</th></tr>${steps}</table></div></div>`;
+}
+
+let curCase = null;
+async function loadCases(st){
+  try {
+    const rows = await api('/v1/cases?status=' + st + '&limit=25');
+    $('#caseList').innerHTML = '<tr><th>#</th><th>Время</th><th>Страна</th><th>Событие</th><th class="num">Сумма</th><th>Решение</th><th class="num">Балл</th><th>Сценарии</th><th>Статус</th></tr>' +
+      (rows.map(r => `<tr class="click" data-id="${r.id}" onclick="openCase(${r.id})"><td>${r.id}</td><td class="mono">${esc((r.created||'').replace('T',' '))}</td><td>${esc(r.jurisdiction)}</td>
+       <td>${esc(r.event_type)}</td><td class="num">${r.amount ? fmt(r.amount)+' '+esc(r.currency) : ''}</td><td>${pill(r.action)}</td><td class="num">${r.score}</td><td>${chips(r.scenarios)}</td><td>${pill(r.status, ST)}</td></tr>`).join('') || '<tr><td colspan=9 class="note">Нет инцидентов</td></tr>');
+  } catch(e){ $('#caseList').innerHTML = `<tr><td class="msg err">${esc(e.message)}</td></tr>`; }
+}
+async function openCase(id){
+  curCase = id;
+  document.querySelectorAll('#caseList tr').forEach(t => t.classList.toggle('sel', t.dataset.id == id));
+  const c = await api('/v1/cases/' + id);
+  const f = c.features; const keys = Object.keys(f).filter(k => f[k] !== false && f[k] !== 0 && f[k] !== null && f[k] !== 0.0);
+  $('#caseCard').innerHTML = `<div><b>Инцидент #${c.id}</b> · ${pill(c.status, ST)} · ${pill(c.action)} · балл ${c.score}</div>
+    <p class="note">Событие ${esc(c.event_id)} · клиент <span class="mono">${esc(c.user_id)}</span> · ${esc(c.jurisdiction)} · ${c.amount ? fmt(c.amount)+' '+esc(c.currency) : esc(c.event_type)} · получатель <span class="mono">${esc(c.recipient_id || '—')}</span></p>
+    <b>Почему сработало</b><ul class="reasons">${c.reasons.map(x => `<li><span class="pts">${x.points > 0 ? '+' : ''}${x.points}</span> <code>${esc(x.code)}</code> ${esc(x.text)}</li>`).join('')}</ul>
+    <details><summary>Признаки на момент решения (${keys.length})</summary><table>${keys.map(k => `<tr><td class="mono">${esc(k)}</td><td>${esc(typeof f[k] === 'number' ? Math.round(f[k]*100)/100 : f[k])}</td></tr>`).join('')}</table></details>
+    <div style="margin-top:10px"><textarea id="cmt" rows="2" placeholder="Комментарий аналитика"></textarea>
+    <label style="font-size:12.5px"><input type="checkbox" id="toList"> добавить получателя во внутренний стоп-лист (если мошенничество)</label><br>
+    <button class="b r" onclick="resolveCase('fraud')">Мошенничество</button> <button class="b g" onclick="resolveCase('legit')">Легитимно</button></div>
+    <div class="msg" id="caseMsg"></div>
+    <b style="display:block;margin-top:10px">История (аудиторский след)</b>
+    <table>${c.history.map(h => `<tr><td class="mono">${esc(h.ts)}</td><td>${esc(h.actor)}</td><td>${esc(h.action)}</td><td class="mono">${esc(h.details||'')}</td></tr>`).join('') || '<tr><td class="note">пусто</td></tr>'}</table>`;
+}
+async function resolveCase(status){
+  try {
+    await api('/v1/cases/' + curCase + '/resolve', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({status, comment: $('#cmt').value, add_to_list: $('#toList').checked})});
+    await openCase(curCase); loadCases('open'); $('#caseMsg').className = 'msg ok'; $('#caseMsg').textContent = 'Сохранено, записано в журнал и отправлен вебхук case.resolved';
+  } catch(e){ $('#caseMsg').className = 'msg err'; $('#caseMsg').textContent = e.message; }
+}
+
+async function loadRules(){
+  try {
+    $('#rulesText').value = await api('/v1/rules');
+    const f = await api('/v1/features');
+    $('#feats').innerHTML = Object.entries(f).map(([k,v]) => `<div><code>${esc(k)}</code> — ${esc(v)}</div>`).join('');
+  } catch(e){ $('#rulesMsg').className='msg err'; $('#rulesMsg').textContent = e.message; }
+}
+async function validateRules(){
+  const r = await api('/v1/rules/validate', {method:'POST', headers:{'Content-Type':'text/plain'}, body: $('#rulesText').value});
+  $('#rulesMsg').className = 'msg ' + (r.valid ? 'ok' : 'err');
+  $('#rulesMsg').textContent = r.valid ? `Корректно: версия ${r.version}, правил ${r.rules}` : 'Ошибка: ' + r.error;
+}
+async function saveRules(){
+  try {
+    const r = await api('/v1/rules', {method:'PUT', headers:{'Content-Type':'text/plain'}, body: $('#rulesText').value});
+    $('#rulesMsg').className = 'msg ok'; $('#rulesMsg').textContent = `Применено: версия ${r.version}, правил ${r.rules}. Записано в журнал.`;
+  } catch(e){ $('#rulesMsg').className='msg err'; $('#rulesMsg').textContent = e.message; }
+}
+
+async function loadLists(){
+  const s = await api('/v1/lists');
+  $('#listSum').innerHTML = '<tr><th>Список</th><th>Страна</th><th class="num">Записей</th><th>Обновлён</th></tr>' +
+    s.map(r => `<tr><td>${esc(r.list_name)}</td><td>${esc(r.jurisdiction)}</td><td class="num">${r.entries}</td><td class="mono">${esc(r.updated)}</td></tr>`).join('');
+}
+$('#csvFile').onchange = async e => { $('#csvText').value = await e.target.files[0].text(); };
+async function importCsv(){
+  try {
+    const r = await api('/v1/lists/import', {method:'POST', headers:{'Content-Type':'text/csv'}, body: $('#csvText').value});
+    $('#listMsg').className = 'msg ' + (r.rejected ? 'err' : 'ok');
+    $('#listMsg').textContent = `Загружено ${r.imported}, отклонено ${r.rejected}` + (r.rejected ? ' (строки: ' + r.rejected_rows.map(x => x.line).join(', ') + ')' : '');
+    loadLists();
+  } catch(e){ $('#listMsg').className='msg err'; $('#listMsg').textContent = e.message; }
+}
+
+async function loadHooks(){
+  const h = await api('/v1/webhooks');
+  $('#deliv').innerHTML = '<tr><th>Время</th><th>Событие</th><th>Статус</th></tr>' + h.deliveries.map(d => `<tr><td class="mono">${esc(d.ts)}</td><td>${esc(d.event)}</td><td>${esc(d.status)}</td></tr>`).join('');
+  const s = await (await fetch('/demo/webhook-sink')).json();
+  $('#sink').innerHTML = '<tr><th>Получено</th><th>Событие</th><th>Подпись</th><th>Данные</th></tr>' + s.map(x => `<tr><td class="mono">${esc(x.received)}</td><td>${esc(x.event)}</td><td>${x.signature_ok ? 'верна' : 'НЕВЕРНА'}</td><td class="mono">${esc(JSON.stringify(x.data).slice(0,90))}</td></tr>`).join('');
+}
+async function loadAudit(){
+  const a = await api('/v1/audit?limit=80');
+  $('#auditT').innerHTML = '<tr><th>Время (UTC)</th><th>Кто</th><th>Роль</th><th>Действие</th><th>Объект</th><th>Подробности</th></tr>' +
+    a.map(r => `<tr><td class="mono">${esc(r.ts)}</td><td>${esc(r.actor)}</td><td>${esc(r.role)}</td><td>${esc(r.action)}</td><td class="mono">${esc(r.object)}</td><td class="mono">${esc((r.details||'').slice(0,120))}</td></tr>`).join('');
+}
+initScen(); loadMon(); setInterval(() => { if ($('#mon').classList.contains('on')) loadMon(); }, 4000);
+</script>
+</body>
+</html>

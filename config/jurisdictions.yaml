@@ -1,0 +1,45 @@
+# Параметры стран присутствия. Перечень стран первой очереди заказчик сообщит позже;
+# здесь — пример для трёх стран. Суммы — в местной валюте.
+# Значения стартовые и настраиваются аналитиком заказчика.
+
+KZ:
+  name: Казахстан
+  currency: KZT
+  usd_rate: 500            # для приведения сумм в признаках ML (условный курс)
+  thresholds: {challenge: 40, decline: 75}
+  limits:
+    large_transfer: 300000       # «крупный» перевод
+    max_single_payment: 5000000  # выше — отклонить
+    small_test_payment: 500      # «пробная» сумма при проверке карт
+  fallback:
+    auto_allow_up_to: 50000      # при недоступности сервиса: до этой суммы — пропустить
+    above_limit: defer           # defer (отложенная проверка) | decline
+  lists: [national_antifraud_kz, internal]
+
+UZ:
+  name: Узбекистан
+  currency: UZS
+  usd_rate: 12700
+  thresholds: {challenge: 40, decline: 75}
+  limits:
+    large_transfer: 7500000
+    max_single_payment: 120000000
+    small_test_payment: 12000
+  fallback:
+    auto_allow_up_to: 1200000
+    above_limit: decline
+  lists: [internal]
+
+KG:
+  name: Кыргызстан
+  currency: KGS
+  usd_rate: 87
+  thresholds: {challenge: 45, decline: 80}
+  limits:
+    large_transfer: 50000
+    max_single_payment: 900000
+    small_test_payment: 90
+  fallback:
+    auto_allow_up_to: 9000
+    above_limit: defer
+  lists: [internal]

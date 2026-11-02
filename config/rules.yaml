@@ -1,0 +1,173 @@
+# Правила антифрод-контура. Редактирует аналитик заказчика (панель → «Правила»
+# или PUT /v1/rules). Изменение проверяется, получает новую версию и пишется в журнал.
+#
+# Итоговый балл = сумма баллов сработавших правил + ML (до ml_weight баллов).
+# Действие: балл ≥ thresholds.challenge — подтверждение, ≥ thresholds.decline — отказ
+# (пороги по странам в jurisdictions.yaml). Поле action задаёт минимальное действие.
+# Значения со знаком $ берутся из настроек страны.
+# Все значения стартовые: калибруются на данных заказчика в пилоте.
+
+version: "2026-11-02.1"
+ml_weight: 40
+
+rules:
+  # --- 1. Социальная инженерия ---
+  - id: SE_NEW_RCP_UNUSUAL_AMOUNT
+    scenario: social_engineering
+    description: Первый перевод новому получателю, сумма в 4+ раза выше обычной
+    when: [[event_type, ==, payment], [channel, in, [p2p, withdrawal]], [new_recipient, ==, true], [amount_vs_usual, ">=", 4]]
+    points: 25
+  - id: SE_ON_CALL
+    scenario: social_engineering
+    description: Перевод новому получателю во время телефонного звонка
+    when: [[event_type, ==, payment], [on_call, ==, true], [new_recipient, ==, true]]
+    points: 25
+  - id: SE_REMOTE_ACCESS
+    scenario: social_engineering
+    description: Операция при запущенном приложении удалённого доступа
+    when: [[event_type, ==, payment], [remote_access_app, ==, true]]
+    points: 35
+    action: challenge
+  - id: SE_SERIES_NEW_RCP
+    scenario: social_engineering
+    description: Серия переводов новым получателям за час (3+)
+    when: [[event_type, ==, payment], [new_recipients_1h, ">=", 3]]
+    points: 20
+  - id: SE_LARGE_NEW_RCP
+    scenario: social_engineering
+    description: Крупный перевод новому получателю
+    when: [[event_type, ==, payment], [new_recipient, ==, true], [amount, ">=", "$limits.large_transfer"]]
+    points: 15
+
+  # --- 2. Захват учётной записи ---
+  - id: ATO_EMULATOR
+    scenario: account_takeover
+    description: Эмулятор вместо реального устройства
+    when: [[emulator, ==, true]]
+    points: 35
+  - id: ATO_ROOTED
+    scenario: account_takeover
+    description: Root / jailbreak / модифицированная ОС
+    when: [[rooted, ==, true]]
+    points: 10
+  - id: ATO_FAILED_LOGINS
+    scenario: account_takeover
+    description: 3+ неуспешных входа за час
+    when: [[event_type, ==, login], [failed_logins_1h, ">=", 3]]
+    points: 30
+  - id: ATO_PROFILE_CHANGE_NEW_DEVICE
+    scenario: account_takeover
+    description: Смена телефона или пароля с нового устройства
+    when: [[event_type, ==, profile_change], [changed_field, in, [phone, password]], [new_device, ==, true]]
+    points: 35
+    action: challenge
+  - id: ATO_NEW_DEVICE_NEW_RCP
+    scenario: account_takeover
+    description: Перевод новому получателю с нового устройства
+    when: [[event_type, ==, payment], [new_device, ==, true], [new_recipient, ==, true]]
+    points: 20
+  - id: ATO_PASSWORD_THEN_PAY
+    scenario: account_takeover
+    description: Перевод в течение суток после смены пароля
+    when: [[event_type, ==, payment], [password_changed_24h, ==, true], [new_recipient, ==, true]]
+    points: 25
+  - id: ATO_PHONE_THEN_PAY
+    scenario: account_takeover
+    description: Перевод в течение суток после смены номера телефона
+    when: [[event_type, ==, payment], [phone_changed_24h, ==, true]]
+    points: 30
+  - id: ATO_GEO_VELOCITY
+    scenario: account_takeover
+    description: Невозможная скорость перемещения между сессиями (900+ км/ч)
+    when: [[geo_velocity_kmh, ">=", 900]]
+    points: 25
+  - id: ATO_FOREIGN_IP_NEW_DEVICE
+    scenario: account_takeover
+    description: Новое устройство и IP другой страны
+    when: [[new_device, ==, true], [ip_country_foreign, ==, true]]
+    points: 20
+
+  # --- 3. Скомпрометированные карты ---
+  - id: CARD_MANY_ON_DEVICE
+    scenario: compromised_cards
+    description: 3+ разных карты на одном устройстве за сутки
+    when: [[cards_device_24h, ">=", 3]]
+    points: 35
+  - id: CARD_MANY_ON_DEVICE_5
+    scenario: compromised_cards
+    description: 5+ разных карт на одном устройстве за сутки
+    when: [[cards_device_24h, ">=", 5]]
+    points: 40
+    action: decline
+  - id: CARD_SHARED_ACCOUNTS
+    scenario: compromised_cards
+    description: Одна карта у 3+ учётных записей за 30 дней
+    when: [[card_users_30d, ">=", 3]]
+    points: 30
+  - id: CARD_TESTING
+    scenario: compromised_cards
+    description: 3+ пробных мелких операции с устройства за час
+    when: [[event_type, ==, payment], [small_payments_1h, ">=", 3]]
+    points: 30
+
+  # --- 4. Дропперские схемы ---
+  - id: DROP_FAST_CASHOUT
+    scenario: droppers
+    description: Быстрый вывод 80%+ средств, полученных за 2 ч от 3+ отправителей, новому получателю
+    when: [[event_type, ==, payment], [channel, in, [p2p, withdrawal]], [outflow_after_inflow, ">=", 0.8], [user_senders_24h, ">=", 3], [new_recipient, ==, true]]
+    points: 45
+    case: true
+  - id: DROP_RCP_MANY_SENDERS
+    scenario: droppers
+    description: Получатель за сутки принимает переводы от 4+ разных людей (не бизнес)
+    when: [[event_type, ==, payment], [channel, ==, p2p], [recipient_is_merchant, ==, false], [recipient_senders_24h, ">=", 4], [new_recipient, ==, true]]
+    points: 30
+  - id: DROP_COLLECTOR_OUT
+    scenario: droppers
+    description: Клиент получил переводы от 5+ людей за сутки и переводит дальше
+    when: [[event_type, ==, payment], [channel, in, [p2p, withdrawal]], [user_senders_24h, ">=", 5]]
+    points: 20
+
+  # --- 5. Мультиаккаунты ---
+  - id: MULTI_DEVICE_ACCOUNTS
+    scenario: multiaccount
+    description: 3+ учётных записи на одном устройстве за 30 дней
+    when: [[device_users_30d, ">=", 3]]
+    points: 20
+  - id: MULTI_BONUS_SAME_DEVICE
+    scenario: multiaccount
+    description: Бонус получают 2+ учётные записи с одного устройства
+    when: [[event_type, ==, bonus_claim], [bonus_users_device_30d, ">=", 2]]
+    points: 45
+  - id: MULTI_BONUS_FARM
+    scenario: multiaccount
+    description: Бонус получают 3+ учётные записи с одного устройства
+    when: [[event_type, ==, bonus_claim], [bonus_users_device_30d, ">=", 3]]
+    points: 30
+    action: decline
+    case: true
+
+  # --- Лимиты и качество данных ---
+  - id: LIMIT_MAX_SINGLE
+    scenario: limits
+    description: Сумма выше максимального лимита страны
+    when: [[event_type, ==, payment], [amount, ">", "$limits.max_single_payment"]]
+    points: 0
+    action: decline
+  - id: DQ_NO_DEVICE
+    scenario: data_quality
+    description: Нет данных об устройстве (SDK не передал)
+    when: [[event_type, ==, payment], [missing_device, ==, true]]
+    points: 15
+
+  # --- Доверительные сигналы (снижают балл) ---
+  - id: TRUST_KNOWN_RCP
+    scenario: social_engineering
+    description: Получатель уже знаком клиенту
+    when: [[event_type, ==, payment], [new_recipient, ==, false]]
+    points: -10
+  - id: TRUST_OLD_DEVICE
+    scenario: account_takeover
+    description: Устройство у клиента дольше 30 дней
+    when: [[device_age_hours, ">=", 720]]
+    points: -5

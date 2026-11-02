@@ -1,0 +1,21 @@
+list_name,jurisdiction,entity_type,value,reason
+national_antifraud_kz,KZ,wallet,w_blk_KZ_0,вымышленная запись для демонстрации
+national_antifraud_kz,KZ,wallet,w_blk_KZ_1,вымышленная запись для демонстрации
+national_antifraud_kz,KZ,wallet,w_blk_KZ_2,вымышленная запись для демонстрации
+national_antifraud_kz,KZ,wallet,w_blk_KZ_3,вымышленная запись для демонстрации
+national_antifraud_kz,KZ,wallet,w_blk_KZ_4,вымышленная запись для демонстрации
+national_antifraud_kz,KZ,wallet,w_blk_KZ_5,вымышленная запись для демонстрации
+internal,UZ,wallet,w_blk_UZ_0,вымышленная запись для демонстрации
+internal,UZ,wallet,w_blk_UZ_1,вымышленная запись для демонстрации
+internal,UZ,wallet,w_blk_UZ_2,вымышленная запись для демонстрации
+internal,UZ,wallet,w_blk_UZ_3,вымышленная запись для демонстрации
+internal,UZ,wallet,w_blk_UZ_4,вымышленная запись для демонстрации
+internal,UZ,wallet,w_blk_UZ_5,вымышленная запись для демонстрации
+internal,KG,wallet,w_blk_KG_0,вымышленная запись для демонстрации
+internal,KG,wallet,w_blk_KG_1,вымышленная запись для демонстрации
+internal,KG,wallet,w_blk_KG_2,вымышленная запись для демонстрации
+internal,KG,wallet,w_blk_KG_3,вымышленная запись для демонстрации
+internal,KG,wallet,w_blk_KG_4,вымышленная запись для демонстрации
+internal,KG,wallet,w_blk_KG_5,вымышленная запись для демонстрации
+national_antifraud_kz,KZ,passport,123,неизвестный тип сущности
+internal,,wallet,w_x,нет страны

@@ -1,0 +1,202 @@
+{
+  "data": "ВЫМЫШЛЕННЫЕ ДАННЫЕ: synthetic seed=7, users=2500, days=14",
+  "model": "coldstart-synthetic-20261102102651",
+  "events": 83614,
+  "fraud_events": 892,
+  "detection_ops_pct": 74.0,
+  "detection_money_ops_pct": 90.3,
+  "false_positive_pct": 0.352,
+  "false_decline_pct": 0.047,
+  "auto_decision_pct": 99.319,
+  "case_share_pct": 0.681,
+  "case_share_legit_pct": 0.098,
+  "scenarios": {
+    "social_engineering": {
+      "name": "Социальная инженерия",
+      "ops": 150,
+      "detected_ops_pct": 90.0,
+      "declined_ops_pct": 56.7,
+      "money_ops": 150,
+      "detected_money_ops_pct": 90.0,
+      "incidents": 135,
+      "detected_incidents_pct": 91.9
+    },
+    "account_takeover": {
+      "name": "Захват учётной записи",
+      "ops": 140,
+      "detected_ops_pct": 45.0,
+      "declined_ops_pct": 28.6,
+      "money_ops": 50,
+      "detected_money_ops_pct": 94.0,
+      "incidents": 25,
+      "detected_incidents_pct": 100.0
+    },
+    "compromised_cards": {
+      "name": "Скомпрометированные карты",
+      "ops": 293,
+      "detected_ops_pct": 86.0,
+      "declined_ops_pct": 72.0,
+      "money_ops": 159,
+      "detected_money_ops_pct": 88.1,
+      "incidents": 25,
+      "detected_incidents_pct": 100.0
+    },
+    "droppers": {
+      "name": "Дропперские схемы",
+      "ops": 24,
+      "detected_ops_pct": 83.3,
+      "declined_ops_pct": 41.7,
+      "money_ops": 24,
+      "detected_money_ops_pct": 83.3,
+      "incidents": 24,
+      "detected_incidents_pct": 83.3
+    },
+    "multiaccount": {
+      "name": "Мультиаккаунты",
+      "ops": 260,
+      "detected_ops_pct": 63.5,
+      "declined_ops_pct": 45.0,
+      "money_ops": 130,
+      "detected_money_ops_pct": 91.5,
+      "incidents": 25,
+      "detected_incidents_pct": 100.0
+    },
+    "stoplist": {
+      "name": "Получатель в стоп-листе",
+      "ops": 25,
+      "detected_ops_pct": 100.0,
+      "declined_ops_pct": 100.0,
+      "money_ops": 25,
+      "detected_money_ops_pct": 100.0,
+      "incidents": 25,
+      "detected_incidents_pct": 100.0
+    }
+  },
+  "legit_lookalikes": {
+    "опечатка в пароле": {
+      "ops": 151,
+      "flagged": 0
+    },
+    "легитимный крупный перевод новому получателю": {
+      "ops": 75,
+      "flagged": 67
+    },
+    "поездка за границу": {
+      "ops": 150,
+      "flagged": 0
+    },
+    "скидываемся на подарок": {
+      "ops": 72,
+      "flagged": 6
+    },
+    "перевод собранных денег": {
+      "ops": 10,
+      "flagged": 8
+    },
+    "ошибка данных: нет устройства": {
+      "ops": 25,
+      "flagged": 0
+    },
+    "новый телефон": {
+      "ops": 75,
+      "flagged": 0
+    },
+    "сменил номер вместе с телефоном": {
+      "ops": 22,
+      "flagged": 0
+    },
+    "платёж после смены телефона": {
+      "ops": 75,
+      "flagged": 1
+    }
+  },
+  "engine_latency_ms": {
+    "p50": 0.1,
+    "p95": 0.14,
+    "p99": 0.18,
+    "max": 1.26
+  },
+  "throughput_single_thread_eps": 9233,
+  "top_rules": {
+    "TRUST_KNOWN_RCP": 15750,
+    "DROP_RCP_MANY_SENDERS": 358,
+    "ATO_EMULATOR": 292,
+    "SE_NEW_RCP_UNUSUAL_AMOUNT": 285,
+    "SE_SERIES_NEW_RCP": 267,
+    "CARD_MANY_ON_DEVICE": 193,
+    "MULTI_DEVICE_ACCOUNTS": 160,
+    "ATO_GEO_VELOCITY": 113,
+    "MULTI_BONUS_SAME_DEVICE": 105,
+    "CARD_MANY_ON_DEVICE_5": 90,
+    "ATO_PHONE_THEN_PAY": 85,
+    "CARD_TESTING": 84
+  },
+  "rules_only": {
+    "detection_ops_pct": 54.6,
+    "detection_money_ops_pct": 69.5,
+    "false_positive_pct": 0.099,
+    "false_decline_pct": 0.007,
+    "scenarios": {
+      "social_engineering": {
+        "name": "Социальная инженерия",
+        "ops": 150,
+        "detected_ops_pct": 59.3,
+        "declined_ops_pct": 16.0,
+        "money_ops": 150,
+        "detected_money_ops_pct": 59.3,
+        "incidents": 135,
+        "detected_incidents_pct": 63.7
+      },
+      "account_takeover": {
+        "name": "Захват учётной записи",
+        "ops": 140,
+        "detected_ops_pct": 31.4,
+        "declined_ops_pct": 10.0,
+        "money_ops": 50,
+        "detected_money_ops_pct": 56.0,
+        "incidents": 25,
+        "detected_incidents_pct": 88.0
+      },
+      "compromised_cards": {
+        "name": "Скомпрометированные карты",
+        "ops": 293,
+        "detected_ops_pct": 52.6,
+        "declined_ops_pct": 40.3,
+        "money_ops": 159,
+        "detected_money_ops_pct": 64.8,
+        "incidents": 25,
+        "detected_incidents_pct": 100.0
+      },
+      "droppers": {
+        "name": "Дропперские схемы",
+        "ops": 24,
+        "detected_ops_pct": 100.0,
+        "declined_ops_pct": 16.7,
+        "money_ops": 24,
+        "detected_money_ops_pct": 100.0,
+        "incidents": 24,
+        "detected_incidents_pct": 100.0
+      },
+      "multiaccount": {
+        "name": "Мультиаккаунты",
+        "ops": 260,
+        "detected_ops_pct": 58.1,
+        "declined_ops_pct": 36.2,
+        "money_ops": 130,
+        "detected_money_ops_pct": 80.8,
+        "incidents": 25,
+        "detected_incidents_pct": 100.0
+      },
+      "stoplist": {
+        "name": "Получатель в стоп-листе",
+        "ops": 25,
+        "detected_ops_pct": 100.0,
+        "declined_ops_pct": 100.0,
+        "money_ops": 25,
+        "detected_money_ops_pct": 100.0,
+        "incidents": 25,
+        "detected_incidents_pct": 100.0
+      }
+    }
+  }
+}

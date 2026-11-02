@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.pytest_cache/
+.idea/
+.vscode/
+*.log
+data/*.db
+lists/inbox/*
+!lists/inbox/.gitkeep

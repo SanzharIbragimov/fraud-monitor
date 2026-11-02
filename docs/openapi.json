@@ -1,0 +1,1678 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "Fraud Monitor — антифрод-контур платёжного приложения (прототип)",
+  "description": "Оценка риска операций и событий учётной записи в реальном времени. Прототип к отклику на задачу Astana Hub (Monexsol). Данные демо — вымышленные.",
+  "version": "0.1.0"
+ },
+ "paths": {
+  "/health": {
+   "get": {
+    "summary": "Health",
+    "operationId": "health_health_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response Health Health Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/score": {
+   "post": {
+    "tags": [
+     "оценка"
+    ],
+    "summary": "Оценить событие до проведения: allow / challenge / decline",
+    "operationId": "score_v1_score_post",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Event"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Decision"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/rules": {
+   "get": {
+    "tags": [
+     "правила"
+    ],
+    "summary": "Get Rules",
+    "operationId": "get_rules_v1_rules_get",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "text/plain": {
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "put": {
+    "tags": [
+     "правила"
+    ],
+    "summary": "Put Rules",
+    "operationId": "put_rules_v1_rules_put",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "text/plain": {
+       "schema": {
+        "type": "string",
+        "title": "Text"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Put Rules V1 Rules Put"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/rules/validate": {
+   "post": {
+    "tags": [
+     "правила"
+    ],
+    "summary": "Validate Rules",
+    "operationId": "validate_rules_v1_rules_validate_post",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "text/plain": {
+       "schema": {
+        "type": "string",
+        "title": "Text"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Validate Rules V1 Rules Validate Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/features": {
+   "get": {
+    "tags": [
+     "правила"
+    ],
+    "summary": "Features",
+    "operationId": "features_v1_features_get",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Features V1 Features Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/jurisdictions": {
+   "get": {
+    "tags": [
+     "правила"
+    ],
+    "summary": "Jurisdictions",
+    "operationId": "jurisdictions_v1_jurisdictions_get",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Jurisdictions V1 Jurisdictions Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/lists": {
+   "get": {
+    "tags": [
+     "стоп-листы"
+    ],
+    "summary": "Lists",
+    "operationId": "lists_v1_lists_get",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "title": "Response Lists V1 Lists Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/lists/import": {
+   "post": {
+    "tags": [
+     "стоп-листы"
+    ],
+    "summary": "Импорт CSV: list_name,jurisdiction,entity_type,value,reason",
+    "operationId": "import_list_v1_lists_import_post",
+    "parameters": [
+     {
+      "name": "replace",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Replace"
+      }
+     },
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "text/csv": {
+       "schema": {
+        "type": "string",
+        "title": "Text"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Import List V1 Lists Import Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases": {
+   "get": {
+    "tags": [
+     "инциденты"
+    ],
+    "summary": "Cases",
+    "operationId": "cases_v1_cases_get",
+    "parameters": [
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "open",
+       "title": "Status"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 50,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "title": "Response Cases V1 Cases Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}": {
+   "get": {
+    "tags": [
+     "инциденты"
+    ],
+    "summary": "Case",
+    "operationId": "case_v1_cases__case_id__get",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Case V1 Cases  Case Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/resolve": {
+   "post": {
+    "tags": [
+     "инциденты"
+    ],
+    "summary": "Resolve",
+    "operationId": "resolve_v1_cases__case_id__resolve_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "examples": [
+         {
+          "status": "fraud",
+          "comment": "подтверждено клиентом",
+          "add_to_list": true
+         }
+        ],
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Resolve V1 Cases  Case Id  Resolve Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/audit": {
+   "get": {
+    "tags": [
+     "инциденты"
+    ],
+    "summary": "Audit",
+    "operationId": "audit_v1_audit_get",
+    "parameters": [
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 100,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "title": "Response Audit V1 Audit Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/decisions/recent": {
+   "get": {
+    "tags": [
+     "мониторинг"
+    ],
+    "summary": "Recent",
+    "operationId": "recent_v1_decisions_recent_get",
+    "parameters": [
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 30,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "title": "Response Recent V1 Decisions Recent Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/metrics": {
+   "get": {
+    "tags": [
+     "мониторинг"
+    ],
+    "summary": "Metrics",
+    "operationId": "metrics_v1_metrics_get",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Metrics V1 Metrics Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/reports/cases.csv": {
+   "get": {
+    "tags": [
+     "отчёты"
+    ],
+    "summary": "Report Cases",
+    "operationId": "report_cases_v1_reports_cases_csv_get",
+    "parameters": [
+     {
+      "name": "date_from",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "",
+       "title": "Date From"
+      }
+     },
+     {
+      "name": "date_to",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "9999",
+       "title": "Date To"
+      }
+     },
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/reports/rules.csv": {
+   "get": {
+    "tags": [
+     "отчёты"
+    ],
+    "summary": "Report Rules",
+    "operationId": "report_rules_v1_reports_rules_csv_get",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/webhooks": {
+   "post": {
+    "tags": [
+     "вебхуки"
+    ],
+    "summary": "Add Webhook",
+    "operationId": "add_webhook_v1_webhooks_post",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "examples": [
+         {
+          "url": "https://example.org/hook",
+          "events": [
+           "case.resolved"
+          ]
+         }
+        ],
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Add Webhook V1 Webhooks Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "вебхуки"
+    ],
+    "summary": "Get Webhooks",
+    "operationId": "get_webhooks_v1_webhooks_get",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Get Webhooks V1 Webhooks Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/demo/webhook-sink": {
+   "get": {
+    "tags": [
+     "демо"
+    ],
+    "summary": "Webhook Sink List",
+    "operationId": "webhook_sink_list_demo_webhook_sink_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "additionalProperties": true,
+          "type": "object"
+         },
+         "type": "array",
+         "title": "Response Webhook Sink List Demo Webhook Sink Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/model": {
+   "get": {
+    "tags": [
+     "модель"
+    ],
+    "summary": "Model Info",
+    "operationId": "model_info_v1_model_get",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Model Info V1 Model Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/model/retrain": {
+   "post": {
+    "tags": [
+     "модель"
+    ],
+    "summary": "Retrain",
+    "operationId": "retrain_v1_model_retrain_post",
+    "parameters": [
+     {
+      "name": "X-API-Key",
+      "in": "header",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "202": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Retrain V1 Model Retrain Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/demo/scenarios": {
+   "get": {
+    "tags": [
+     "демо"
+    ],
+    "summary": "Demo List",
+    "operationId": "demo_list_demo_scenarios_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response Demo List Demo Scenarios Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/demo/scenario/{name}": {
+   "post": {
+    "tags": [
+     "демо"
+    ],
+    "summary": "Demo Run",
+    "operationId": "demo_run_demo_scenario__name__post",
+    "parameters": [
+     {
+      "name": "name",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Name"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Demo Run Demo Scenario  Name  Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "Action": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "challenge",
+     "decline"
+    ],
+    "title": "Action"
+   },
+   "Channel": {
+    "type": "string",
+    "enum": [
+     "p2p",
+     "service",
+     "qr",
+     "merchant",
+     "withdrawal"
+    ],
+    "title": "Channel"
+   },
+   "Decision": {
+    "properties": {
+     "event_id": {
+      "type": "string",
+      "title": "Event Id"
+     },
+     "action": {
+      "$ref": "#/components/schemas/Action"
+     },
+     "score": {
+      "type": "integer",
+      "maximum": 100.0,
+      "minimum": 0.0,
+      "title": "Score"
+     },
+     "ml_probability": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ml Probability"
+     },
+     "reasons": {
+      "items": {
+       "$ref": "#/components/schemas/Reason"
+      },
+      "type": "array",
+      "title": "Reasons",
+      "default": []
+     },
+     "scenarios": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Scenarios",
+      "description": "Сценарии раздела 4 ТЗ, на которые похожа операция",
+      "default": []
+     },
+     "case_id": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Case Id"
+     },
+     "jurisdiction": {
+      "type": "string",
+      "title": "Jurisdiction"
+     },
+     "rules_version": {
+      "type": "string",
+      "title": "Rules Version"
+     },
+     "model_version": {
+      "type": "string",
+      "title": "Model Version"
+     },
+     "latency_ms": {
+      "type": "number",
+      "title": "Latency Ms",
+      "default": 0
+     },
+     "degraded": {
+      "type": "boolean",
+      "title": "Degraded",
+      "description": "Ответ без ML-компонента (превышен бюджет времени)",
+      "default": false
+     }
+    },
+    "type": "object",
+    "required": [
+     "event_id",
+     "action",
+     "score",
+     "jurisdiction",
+     "rules_version",
+     "model_version"
+    ],
+    "title": "Decision"
+   },
+   "Event": {
+    "properties": {
+     "event_id": {
+      "type": "string",
+      "title": "Event Id"
+     },
+     "event_type": {
+      "$ref": "#/components/schemas/EventType"
+     },
+     "ts": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Ts"
+     },
+     "jurisdiction": {
+      "type": "string",
+      "title": "Jurisdiction",
+      "description": "Страна присутствия: KZ, UZ, KG …"
+     },
+     "user_id": {
+      "type": "string",
+      "title": "User Id"
+     },
+     "account_created": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Account Created"
+     },
+     "session": {
+      "$ref": "#/components/schemas/Session",
+      "default": {
+       "emulator": false,
+       "rooted": false,
+       "remote_access_app": false,
+       "on_call": false
+      }
+     },
+     "payment": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Payment"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "login_success": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Login Success"
+     },
+     "changed_field": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Changed Field"
+     },
+     "card_hash": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Card Hash"
+     },
+     "card_bin": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Card Bin"
+     },
+     "promo_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Promo Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "event_id",
+     "event_type",
+     "ts",
+     "jurisdiction",
+     "user_id"
+    ],
+    "title": "Event"
+   },
+   "EventType": {
+    "type": "string",
+    "enum": [
+     "payment",
+     "login",
+     "card_bind",
+     "profile_change",
+     "bonus_claim"
+    ],
+    "title": "EventType"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "Payment": {
+    "properties": {
+     "channel": {
+      "$ref": "#/components/schemas/Channel"
+     },
+     "amount": {
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "title": "Amount"
+     },
+     "currency": {
+      "type": "string",
+      "title": "Currency"
+     },
+     "recipient_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Recipient Id",
+      "description": "Кошелёк/телефон/карта получателя (хеш)"
+     },
+     "recipient_type": {
+      "type": "string",
+      "title": "Recipient Type",
+      "description": "wallet | card | phone | merchant | iban",
+      "default": "wallet"
+     },
+     "recipient_user_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Recipient User Id",
+      "description": "Если получатель — клиент этого же приложения"
+     },
+     "card_hash": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Card Hash",
+      "description": "Токен/хеш карты списания"
+     },
+     "card_bin": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Card Bin"
+     },
+     "card_last4": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Card Last4"
+     }
+    },
+    "type": "object",
+    "required": [
+     "channel",
+     "amount",
+     "currency"
+    ],
+    "title": "Payment"
+   },
+   "Reason": {
+    "properties": {
+     "code": {
+      "type": "string",
+      "title": "Code"
+     },
+     "source": {
+      "type": "string",
+      "title": "Source",
+      "description": "rule | ml | list | policy"
+     },
+     "points": {
+      "type": "number",
+      "title": "Points",
+      "default": 0
+     },
+     "text": {
+      "type": "string",
+      "title": "Text",
+      "default": ""
+     }
+    },
+    "type": "object",
+    "required": [
+     "code",
+     "source"
+    ],
+    "title": "Reason"
+   },
+   "Session": {
+    "properties": {
+     "device_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Device Id",
+      "description": "Идентификатор устройства из SDK"
+     },
+     "os": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Os"
+     },
+     "emulator": {
+      "type": "boolean",
+      "title": "Emulator",
+      "default": false
+     },
+     "rooted": {
+      "type": "boolean",
+      "title": "Rooted",
+      "description": "Root / jailbreak / модифицированная ОС",
+      "default": false
+     },
+     "remote_access_app": {
+      "type": "boolean",
+      "title": "Remote Access App",
+      "description": "Запущено приложение удалённого доступа",
+      "default": false
+     },
+     "on_call": {
+      "type": "boolean",
+      "title": "On Call",
+      "description": "Идёт телефонный звонок во время операции",
+      "default": false
+     },
+     "ip": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ip"
+     },
+     "ip_country": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ip Country"
+     },
+     "lat": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Lat"
+     },
+     "lon": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Lon"
+     }
+    },
+    "type": "object",
+    "title": "Session"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   }
+  }
+ }
+}
